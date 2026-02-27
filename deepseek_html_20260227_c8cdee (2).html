@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check visa</title>
+    <style>
+        /* RESET & BASICS */
+        body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0; background-color: #fff; color: #333; font-size: 12px; }
+        a { text-decoration: none; }
+        .container { width: 960px; margin: 0 auto; }
+
+        /* HEADER */
+        header {
+            background: url('https://bdl.lat/head-backgr.png') no-repeat top left;
+            background-size: 100% 100%;
+            height: 165px;
+            position: relative;
+            color: white;
+            overflow: hidden;
+        }
+        .header-content { display: flex; align-items: center; padding: 25px 20px 0 20px; position: relative; z-index: 2; }
+        .logo-left {
+            width: 65px; height: 75px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Coat_of_arms_of_Moldova.svg/1200px-Coat_of_arms_of_Moldova.svg.png') no-repeat center center;
+            background-size: contain; margin-right: 15px;
+        }
+        .header-text h1 { font-size: 14px; margin: 0; font-weight: normal; line-height: 1.3; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .header-right { margin-left: auto; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+        .flags img { height: 12px; width: auto; margin-left: 5px; cursor: pointer; vertical-align: middle; }
+        .logo-right img { height: 85px; display: block; }
+
+        /* NAVIGATION */
+        .nav-bar-container { background-color: #3065a5; border-top: 1px solid #5aa1d6; margin-top: -30px; position: relative; z-index: 5; }
+        .nav-links { display: flex; width: 960px; margin: 0 auto; }
+        .nav-links a {
+            color: white; font-size: 11px; padding: 8px 12px; border-right: 1px solid rgba(255,255,255,0.3);
+            position: relative; display: block; font-weight: bold;
+        }
+        .nav-links a:hover { background-color: rgba(255,255,255,0.1); }
+        .nav-links a::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        .nav-links a.start::before { background-color: #f0ad4e; }
+        .nav-links a.need::before { background-color: #6f42c1; }
+        .nav-links a.apply::before { background-color: #aeb43d; }
+        .nav-links a.continue::before { background-color: #5bc0de; }
+        .nav-links a.status::before { background-color: #d9534f; }
+        .nav-links a.check::before { background-color: #f0ad4e; }
+
+        /* CONTENT LAYOUT */
+        .page-title-mini { padding: 5px 0; font-size: 11px; }
+        .separator { border-top: 1px dashed #2e6da4; margin: 10px 0 20px 0; width: 100%; }
+        .content-wrapper { display: flex; gap: 15px; }
+
+        /* SIDEBAR */
+        .sidebar { width: 190px; flex-shrink: 0; }
+        .info-box { border: 1px solid #000; background-color: #f0f0f0; }
+        .info-header { background-color: #f0f0f0; padding: 5px; font-size: 11px; font-weight: bold; border-bottom: 1px solid #000; text-align: center; }
+        .info-content { padding: 10px; text-align: center; background-color: #fff; }
+        .btn-info {
+            display: block; width: 100%; padding: 8px 0; background: linear-gradient(to bottom, #5d9cd8, #3b7cbd);
+            color: white; text-align: center; border: 1px solid #2e6da4; border-radius: 3px; font-size: 11px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); line-height: 1.3;
+        }
+
+        /* MAIN FORM AREA */
+        .main-area { flex-grow: 1; }
+        .section-header { font-weight: bold; font-size: 12px; margin-bottom: 2px; color: #000; }
+        .section-line { border-top: 1px solid #b0b0b0; margin-bottom: 0; height: 1px; }
+
+        /* FORM CONTAINER */
+        .form-container {
+            border: 1px solid #b0b0b0; background-color: #dceef0; 
+            min-height: 400px; display: flex;
+        }
+        
+        .form-left { padding: 15px; width: 280px; border-right: 1px dotted #ccc; }
+        .form-right { flex-grow: 1; padding: 15px; position: relative; min-height: 400px; }
+        
+        .form-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 3px; font-size: 12px; color: #000; }
+        input[type="text"] { width: 250px; padding: 3px; border: 1px solid #777; background: #fff; }
+
+        /* CAPTCHA STYLING */
+        .captcha-box {
+            width: 180px;
+            height: 60px;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 0px solid #bcd3e8;
+            background-color: #CFE6F2;
+            background-image:
+                radial-gradient(circle, rgba(0,90,200,0.15) 1px, transparent 1px),
+                radial-gradient(circle, rgba(0,90,200,0.12) 1px, transparent 1px),
+                radial-gradient(circle, rgba(0,90,200,0.08) 1px, transparent 1px);
+            background-size: 12px 6px, 10px 10px, 14px 14px;
+            background-position: 0 0, 5px 3px, 3px 7px;
+        }
+        .captcha-box::before {
+            content: ""; position: absolute; inset: 0;
+            background: repeating-linear-gradient(20deg, rgba(0,120,255,0.06), rgba(0,120,255,0.06) 2px, transparent 2px, transparent 5px);
+            mix-blend-mode: overlay; opacity: 0.3;
+        }
+        .captcha-text {
+            font-family: "Courier New", monospace; font-size: 32px; font-weight: bold; color: #578CE5;
+            letter-spacing: 5px; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(3deg) skewX(-6deg);
+            z-index: 5; user-select: none;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8), -1px -1px 1px rgba(0,0,0,0.1);
+            opacity: 0.4; filter: blur(0.2px) contrast(1.1);
+        }
+
+        .refresh-link { display: block; margin-bottom: 10px; color: #0000ff; text-decoration: underline; font-size: 11px; cursor: pointer; }
+
+        .btn-check {
+            margin-top: 15px;
+            background: linear-gradient(to bottom, #5c8fc2 0%, #467bb0 50%, #3b6eac 100%);
+            border: 1px solid #2b5680; color: white; padding: 6px 0; width: 100%; max-width: 255px;
+            text-align: center; font-size: 13px; border-radius: 4px; cursor: pointer;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.2); text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+        }
+        .btn-check:hover { background: linear-gradient(to bottom, #4477aa, #5c8fc2); }
+        .btn-check:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error-message { color: red; font-weight: bold; margin-bottom: 10px; }
+
+        /* LOADING ANIMATION */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #3065a5;
+            border-top: 5px solid #f0ad4e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #3065a5;
+            font-weight: bold;
+        }
+
+        .loading-subtext {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* === VISA RESULT CARD STYLING - EXACT PNG MATCH === */
+        .visa-result-card {
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: #000;
+            width: 100%;
+            box-sizing: border-box;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Top Section: Photo + Personal Details */
+        .result-top-section {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 5px;
+        }
+
+        /* Photo Column */
+        .photo-col-wrapper {
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .visa-photo {
+            width: 150px; 
+            height: 180px; 
+            object-fit: cover; 
+            display: block;
+            background-color: #fff;
+            border: 1px solid #999;
+        }
+
+        /* Personal Details Column */
+        .personal-details-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 5px;
+        }
+
+        /* Rows Styling - EXACT MATCH */
+        .detail-row {
+            margin-bottom: 6px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .lbl {
+            font-weight: normal;
+            color: #333;
+        }
+        .val {
+            font-weight: bold;
+            margin-left: 5px;
+            color: #000;
+        }
+
+        /* Bottom Section - Visa Status & Validity */
+        .result-bottom-section {
+            display: block;
+            margin-top: 10px;
+            margin-left: 170px; /* Align under photo */
+        }
+
+        .status-row {
+            color: red;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .validity-row {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .bold-label {
+            font-weight: bold;
+            color: #000;
+        }
+
+        .search-info {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #555;
+            border-top: 1px dashed #999;
+            padding-top: 10px;
+        }
+
+        /* Button Styling */
+        .action-btn-wrapper {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .search-btn {
+            background: linear-gradient(to bottom, #4f8bca, #366cb3);
+            border: 1px solid #295798;
+            color: white;
+            padding: 8px 30px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 5px;
+        }
+        .search-btn:hover {
+            background: #366cb3;
+        }
+
+        .qr-code-small {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .qr-code-small img {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* FOOTER */
+        footer { margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; display: flex; justify-content: space-between; color: #bbb; font-size: 11px; margin-bottom: 20px; }
+        footer a { color: #0000ff; text-decoration: underline; }
+        .version { color: #ccc; }
+        .email { color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="page-title-mini">Check visa</div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <div class="logo-left"></div>
+            <div class="header-text">
+                <h1>Ministry of foreign affairs and european integration<br>of the republic of moldova</h1>
+            </div>
+            <div class="header-right">
+                <div class="flags">
+                    <img src="https://bdl.lat/MLD-passive.png" alt="MD">
+                    <img src="https://bdl.lat/ENG.png" alt="UK">
+                </div>
+                <div class="logo-right">
+                    <img src="https://bdl.lat/eVisa.png" alt="Visa Moldova">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION -->
+    <div class="nav-bar-container">
+        <div class="container">
+            <nav class="nav-links">
+                <a href="https://www.evisa.gov.md/Home/Index" class="start">START</a>
+                <a href="https://www.mfa.gov.md/ro/content/regimul-de-vize" class="need">DO I NEED A VISA?</a>
+                <a href="https://www.evisa.gov.md/VisaFile/Inregistrare" class="apply">APPLY NOW</a>
+                <a href="https://www.evisa.gov.md/VisaFile/Continua" class="continue">CONTINUE APPLICATION</a>
+                <a href="https://www.evisa.gov.md/VisaFile/Verifica" class="status">CHECK YOUR APPLICATION STATUS</a>
+                <a href="check-my-visa.php" class="check">CHECK VISA</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container" style="margin-top: 0;">
+        <div class="separator"></div>
+
+        <div class="content-wrapper">
+            
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <div class="info-box">
+                    <div class="info-header">Things you should know</div>
+                    <div class="info-content">
+                        <a href="https://www.evisa.gov.md/Info/ThingsYouShouldKnow" class="btn-info">
+                            10 things you should know<br>about the eVisa
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN AREA -->
+            <main class="main-area">
+                <div class="section-header">Seeking visa</div>
+                <div class="section-line"></div>
+
+                <div class="form-container">
+                    
+                    <!-- FORM LEFT - SEARCH -->
+                    <div class="form-left">
+                        <form method="POST" action="" onsubmit="event.preventDefault(); checkVisaWithLoading();">
+                            <div class="form-group">
+                                <label>Visa number</label>
+                                <input type="text" name="visaNumber" id="visaNumber" required value="">
+                            </div>
+
+                            <div class="captcha-box" id="captchaBox">
+                                <div class="captcha-text" id="captchaDisplay">N9XEUY</div>
+                            </div>
+                            
+                            <a href="#" class="refresh-link" onclick="refreshCaptcha(); return false;">Refresh</a>
+
+                            <div class="form-group">
+                                <label>Verification code</label>
+                                <input type="text" name="captchaCode" id="captchaCode" required>
+                            </div>
+
+                            <button type="submit" name="check_visa" class="btn-check" id="checkBtn">Check</button>
+                        </form>
+                    </div>
+
+                    <!-- FORM RIGHT - RESULTS WITH LOADING OVERLAY -->
+                    <div class="form-right" id="resultContainer">
+                        <!-- Loading Overlay -->
+                        <div class="loading-overlay" id="loadingOverlay">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Se caută...</div>
+                            <div class="loading-subtext">Verificăm datele vizei</div>
+                        </div>
+                        
+                        <!-- Initial Message -->
+                        <div style="color: #666; text-align: center; margin-top: 50px;" id="initialMessage">
+                            Enter visa number and click Check
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="version">Version: 1.6.1.0</div>
+            <div class="email">
+                E-mail: <a href="mailto:evisa@mfa.gov.md">evisa@mfa.gov.md</a>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // ফ্ল্যাগ
+    const FLAG = "MOLDOVA{loading_animation_15_entries}";
+
+    // ১৫ জনের ডাটাবেস
+    const visaDatabase = [
+        { 
+            visaNumber: "PA1232072",
+            photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=180&fit=crop",
+            lastName: "HALIM",
+            firstName: "RAHI",
+            fatherName: "-",
+            dob: "21/09/2005",
+            citizenship: "BANGLADESH",
+            passport: "PA1232072",
+            visaType: "C - C/T",
+            validFrom: "27/02/2026",
+            validTo: "29/05/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "90",
+            status: "GRANTED",
+            approvalDate: "15/02/2026"
+        },
+        { 
+            visaNumber: "PB9876543",
+            photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=180&fit=crop",
+            lastName: "CHAUDHARY",
+            firstName: "SUNDAR LAL",
+            fatherName: "RAM LAL",
+            dob: "15/03/1990",
+            citizenship: "INDIA",
+            passport: "PB9876543",
+            visaType: "C - B",
+            validFrom: "10/01/2026",
+            validTo: "09/04/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "30",
+            status: "GRANTED",
+            approvalDate: "08/01/2026"
+        },
+        { 
+            visaNumber: "PC4567890",
+            photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=180&fit=crop",
+            lastName: "RAHMAN",
+            firstName: "MOHAMMAD",
+            fatherName: "ABDUL",
+            dob: "07/11/1985",
+            citizenship: "PAKISTAN",
+            passport: "PC4567890",
+            visaType: "C - T",
+            validFrom: "20/02/2026",
+            validTo: "20/05/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "60",
+            status: "GRANTED",
+            approvalDate: "18/02/2026"
+        },
+        { 
+            visaNumber: "PD7890123",
+            photo: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=150&h=180&fit=crop",
+            lastName: "CHEN",
+            firstName: "WEI",
+            fatherName: "CHEN MING",
+            dob: "03/05/1995",
+            citizenship: "CHINA",
+            passport: "PD7890123",
+            visaType: "C - B",
+            validFrom: "15/03/2026",
+            validTo: "14/06/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "45",
+            status: "GRANTED",
+            approvalDate: "12/03/2026"
+        },
+        { 
+            visaNumber: "PE2345678",
+            photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=180&fit=crop",
+            lastName: "SMITH",
+            firstName: "JOHN",
+            fatherName: "ROBERT",
+            dob: "28/08/1978",
+            citizenship: "USA",
+            passport: "PE2345678",
+            visaType: "C - T",
+            validFrom: "05/04/2026",
+            validTo: "05/07/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "90",
+            status: "GRANTED",
+            approvalDate: "03/04/2026"
+        },
+        { 
+            visaNumber: "PF3456789",
+            photo: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&h=180&fit=crop",
+            lastName: "MULLER",
+            firstName: "HANS",
+            fatherName: "-",
+            dob: "12/12/1982",
+            citizenship: "GERMANY",
+            passport: "PF3456789",
+            visaType: "C - B",
+            validFrom: "22/04/2026",
+            validTo: "22/07/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "30",
+            status: "GRANTED",
+            approvalDate: "20/04/2026"
+        },
+        { 
+            visaNumber: "PG4567890",
+            photo: "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=150&h=180&fit=crop",
+            lastName: "DUBOIS",
+            firstName: "MARIE",
+            fatherName: "JEAN",
+            dob: "19/06/1992",
+            citizenship: "FRANCE",
+            passport: "PG4567890",
+            visaType: "C - C/T",
+            validFrom: "01/05/2026",
+            validTo: "01/08/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "90",
+            status: "GRANTED",
+            approvalDate: "28/04/2026"
+        },
+        { 
+            visaNumber: "PH5678901",
+            photo: "https://images.unsplash.com/photo-150821297465-3d76eaf741a6?w=150&h=180&fit=crop",
+            lastName: "ROSSI",
+            firstName: "MARCO",
+            fatherName: "GIUSEPPE",
+            dob: "30/09/1988",
+            citizenship: "ITALY",
+            passport: "PH5678901",
+            visaType: "C - B",
+            validFrom: "12/05/2026",
+            validTo: "12/08/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "45",
+            status: "GRANTED",
+            approvalDate: "10/05/2026"
+        },
+        { 
+            visaNumber: "PI6789012",
+            photo: "https://images.unsplash.com/photo-1509460913899-515f1df34fea?w=150&h=180&fit=crop",
+            lastName: "KUMAR",
+            firstName: "RAJESH",
+            fatherName: "SURESH",
+            dob: "25/01/1975",
+            citizenship: "NEPAL",
+            passport: "PI6789012",
+            visaType: "C - T",
+            validFrom: "20/05/2026",
+            validTo: "20/08/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "60",
+            status: "GRANTED",
+            approvalDate: "18/05/2026"
+        },
+        { 
+            visaNumber: "PJ7890123",
+            photo: "https://images.unsplash.com/photo-1524502397803-8b0edf8b8b9b?w=150&h=180&fit=crop",
+            lastName: "AHMED",
+            firstName: "FATIMA",
+            fatherName: "HASSAN",
+            dob: "17/04/1998",
+            citizenship: "EGYPT",
+            passport: "PJ7890123",
+            visaType: "C - B",
+            validFrom: "01/06/2026",
+            validTo: "01/09/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "30",
+            status: "GRANTED",
+            approvalDate: "28/05/2026"
+        },
+        { 
+            visaNumber: "PK8901234",
+            photo: "https://images.unsplash.com/photo-1519085360753-af56d4c4c5d5?w=150&h=180&fit=crop",
+            lastName: "SANTOS",
+            firstName: "JOSE",
+            fatherName: "MANUEL",
+            dob: "09/07/1980",
+            citizenship: "BRAZIL",
+            passport: "PK8901234",
+            visaType: "C - C/T",
+            validFrom: "15/06/2026",
+            validTo: "15/09/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "90",
+            status: "GRANTED",
+            approvalDate: "12/06/2026"
+        },
+        { 
+            visaNumber: "PL9012345",
+            photo: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150&h=180&fit=crop",
+            lastName: "NGUYEN",
+            firstName: "THI",
+            fatherName: "VAN",
+            dob: "22/11/1993",
+            citizenship: "VIETNAM",
+            passport: "PL9012345",
+            visaType: "C - B",
+            validFrom: "20/06/2026",
+            validTo: "20/09/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "45",
+            status: "GRANTED",
+            approvalDate: "18/06/2026"
+        },
+        { 
+            visaNumber: "PM0123456",
+            photo: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=150&h=180&fit=crop",
+            lastName: "SAEED",
+            firstName: "LAYLA",
+            fatherName: "OMAR",
+            dob: "05/02/1987",
+            citizenship: "JORDAN",
+            passport: "PM0123456",
+            visaType: "C - T",
+            validFrom: "01/07/2026",
+            validTo: "01/10/2026",
+            entries: "Intrări multiple / Multiple entrances",
+            duration: "60",
+            status: "GRANTED",
+            approvalDate: "28/06/2026"
+        },
+        { 
+            visaNumber: "PN1234567",
+            photo: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=150&h=180&fit=crop",
+            lastName: "KIM",
+            firstName: "MIN JI",
+            fatherName: "KIM JONG",
+            dob: "14/10/2000",
+            citizenship: "SOUTH KOREA",
+            passport: "PN1234567",
+            visaType: "C - B",
+            validFrom: "10/07/2026",
+            validTo: "10/10/2026",
+            entries: "Intrare unică / Single entry",
+            duration: "30",
+            status: "GRANTED",
+            approvalDate: "08/07/2026"
+        }
+    ];
+
+    // ক্যাপচা রিফ্রেশ ফাংশন
+    function refreshCaptcha() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let captcha = '';
+        for (let i = 0; i < 6; i++) {
+            captcha += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        document.getElementById('captchaDisplay').textContent = captcha;
+        document.getElementById('captchaCode').value = '';
+    }
+
+    // পেজ লোডে প্রথম ক্যাপচা
+    window.onload = function() {
+        refreshCaptcha();
+        console.log('%c🇲🇩 FLAG: MOLDOVA{loading_animation_15_entries}', 'background: #0a2f1f; color: #c49b3f; font-size: 14px; padding: 8px; border-radius: 4px;');
+    };
+
+    // লোডিং সহ ভিসা চেক
+    function checkVisaWithLoading() {
+        const visaNumber = document.getElementById('visaNumber').value.trim();
+        const captchaInput = document.getElementById('captchaCode').value.trim();
+        const captchaDisplay = document.getElementById('captchaDisplay').textContent;
+        const resultContainer = document.getElementById('resultContainer');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const checkBtn = document.getElementById('checkBtn');
+        const initialMessage = document.getElementById('initialMessage');
+
+        // খালি চেক
+        if (!visaNumber || !captchaInput) {
+            alert('Please enter visa number and verification code');
+            return;
+        }
+
+        // ক্যাপচা চেক
+        if (captchaInput.toUpperCase() !== captchaDisplay.toUpperCase()) {
+            resultContainer.innerHTML = '<div style="color: red; text-align: center; margin-top: 50px;">Invalid verification code</div>';
+            refreshCaptcha();
+            return;
+        }
+
+        // ইনিশিয়াল মেসেজ লুকাও
+        if (initialMessage) {
+            initialMessage.style.display = 'none';
+        }
+
+        // বাটন ডিজেবল করো
+        checkBtn.disabled = true;
+        
+        // লোডিং দেখাও
+        loadingOverlay.style.display = 'flex';
+        
+        // আগের রেজাল্ট ক্লিয়ার করো
+        resultContainer.innerHTML = '';
+        resultContainer.appendChild(loadingOverlay);
+
+        // ৩ সেকেন্ড পর রেজাল্ট দেখাও
+        setTimeout(function() {
+            // ভিসা খোঁজো
+            let found = null;
+            for (let i = 0; i < visaDatabase.length; i++) {
+                if (visaDatabase[i].visaNumber === visaNumber) {
+                    found = visaDatabase[i];
+                    break;
+                }
+            }
+
+            // লোডিং লুকাও
+            loadingOverlay.style.display = 'none';
+            
+            // বাটন এনেবল করো
+            checkBtn.disabled = false;
+
+            if (found) {
+                // আজকের তারিখ
+                const today = new Date();
+                const day = today.getDate().toString().padStart(2,'0');
+                const month = (today.getMonth()+1).toString().padStart(2,'0');
+                const year = today.getFullYear();
+                const hour = today.getHours().toString().padStart(2,'0');
+                const minute = today.getMinutes().toString().padStart(2,'0');
+                const searchDateTime = `${day}/${month}/${year} ${hour}:${minute}`;
+
+                // PNG-এর মতো হুবহু রেজাল্ট
+                resultContainer.innerHTML = `
+                    <div class="visa-result-card">
+                        <!-- TOP SECTION: PHOTO + PERSONAL DETAILS -->
+                        <div class="result-top-section">
+                            <div class="photo-col-wrapper">
+                                <img src="${found.photo}" alt="Applicant Photo" class="visa-photo" onerror="this.src='https://via.placeholder.com/150x180?text=No+Photo'">
+                            </div>
+                            <div class="personal-details-col">
+                                <div class="detail-row">
+                                    <span class="lbl">Nume / Last name:</span>
+                                    <span class="val">${found.lastName}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="lbl">Prenume / First name:</span>
+                                    <span class="val">${found.firstName}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="lbl">Patronimic / Father's name:</span>
+                                    <span class="val">${found.fatherName}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="lbl">Data naşterii / Date of Birth:</span>
+                                    <span class="val">${found.dob}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="lbl">Cetăţenia / Country of citizenship:</span>
+                                    <span class="val">${found.citizenship}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="lbl">Numărul documentului de călătorie:</span>
+                                    <span class="val">${found.passport}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BOTTOM SECTION: VISA DETAILS -->
+                        <div class="result-bottom-section">
+                            <div class="status-row">
+                                ${found.status}
+                            </div>
+                            <div class="validity-row">
+                                <span class="bold-label">Tipul vizei / Visa type:</span> ${found.visaType}
+                            </div>
+                            <div class="validity-row">
+                                <span class="bold-label">Valabilitatea vizei / Visa validity:</span> de la / from ${found.validFrom} pînă la / to ${found.validTo}
+                            </div>
+                            <div class="validity-row">
+                                <span class="bold-label">Numărul de intrări / Number of entries:</span> ${found.entries}
+                            </div>
+                            <div class="validity-row">
+                                <span class="bold-label">Durata sejurului / Duration of stay:</span> ${found.duration} zile
+                            </div>
+                            <div class="validity-row">
+                                <span class="bold-label">DATA APROBĂRII / DATE OF APPROVAL:</span> ${found.approvalDate}
+                            </div>
+                            <div class="search-info">
+                                <span class="bold-label">Data și ora verificării / Date and time of verification:</span> ${searchDateTime}
+                            </div>
+                            
+                            <!-- ACTION BUTTONS -->
+                            <div class="action-btn-wrapper">
+                                <button class="search-btn" onclick="window.print()">🖨️ Print</button>
+                                <a href="https://eviza.gov.md/download/${found.visaNumber}" class="search-btn" target="_blank">⬇️ Download</a>
+                            </div>
+                            
+                            <!-- QR CODE -->
+                            <div class="qr-code-small">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=EVisa%20Moldova%20-%20${found.visaNumber}" alt="QR Code">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // সফল অনুসন্ধানের পর নতুন ক্যাপচা
+                refreshCaptcha();
+                
+            } else {
+                resultContainer.innerHTML = '<div style="color: red; text-align: center; margin-top: 50px;">Visa not found. Please check the visa number.</div>';
+                refreshCaptcha();
+            }
+        }, 3000); // ৩ সেকেন্ড লোডিং
+    }
+</script>
+
+</body>
+</html>
